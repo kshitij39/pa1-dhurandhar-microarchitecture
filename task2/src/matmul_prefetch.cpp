@@ -19,7 +19,8 @@ int mini(int a,int b)
 }
 const int BLOCK_M=64;
 const int BLOCK_N=64;
-const int PREFETCH_DISTANCE =32;
+const int PREFETCH_DISTANCE =256;
+const int STRIDE =256;
 void matmul_prefetch(const float* A, const float* B, float* C,
 		int M, int N, int K, int lda, int ldb, int ldc) {
 	// TODO(student): replace this placeholder with your cache-blocked SIMD + prefetch
@@ -45,7 +46,7 @@ void matmul_prefetch(const float* A, const float* B, float* C,
 					__m256 acc6=_mm256_setzero_ps();
 					__m256 acc7=_mm256_setzero_ps();
 					//initialise to store 8 float values of a
-					__m256 ar=_mm256_setzero_ps();
+					//__m256 ar=_mm256_setzero_ps();
 					__m256 ar2=_mm256_setzero_ps();
 					//to store 8 float values of b
 					const float *b0=B + static_cast<long>(j+0)*ldb;
@@ -59,7 +60,7 @@ void matmul_prefetch(const float* A, const float* B, float* C,
 
 
 					int p=0;
-					for(;p<=K-16;p=p+16){
+					for(;p<=K-STRIDE;p=p+STRIDE){
 
 						//prefetching
 						//only prefetch the 8float of a
@@ -75,6 +76,7 @@ void matmul_prefetch(const float* A, const float* B, float* C,
 						_mm_prefetch((const char*)(b7+p+PREFETCH_DISTANCE),_MM_HINT_T0);
 						*/
 
+						/*
 						ar=_mm256_loadu_ps(a+p);
 						acc0=_mm256_fmadd_ps(ar,_mm256_loadu_ps(b0+p),acc0);
 						acc1=_mm256_fmadd_ps(ar,_mm256_loadu_ps(b1+p),acc1);
@@ -94,6 +96,20 @@ void matmul_prefetch(const float* A, const float* B, float* C,
 						acc5=_mm256_fmadd_ps(ar2,_mm256_loadu_ps(b5+p+8),acc5);
 						acc6=_mm256_fmadd_ps(ar2,_mm256_loadu_ps(b6+p+8),acc6);
 						acc7=_mm256_fmadd_ps(ar2,_mm256_loadu_ps(b7+p+8),acc7);
+						*/
+						for(int i=0;i<STRIDE;i=i+8)
+						{
+						  ar2=_mm256_loadu_ps(a+p+i);
+						  acc0=_mm256_fmadd_ps(ar2,_mm256_loadu_ps(b0+p+i),acc0);
+						  acc1=_mm256_fmadd_ps(ar2,_mm256_loadu_ps(b1+p+i),acc1);
+						  acc2=_mm256_fmadd_ps(ar2,_mm256_loadu_ps(b2+p+i),acc2);
+						  acc3=_mm256_fmadd_ps(ar2,_mm256_loadu_ps(b3+p+i),acc3);
+						  acc4=_mm256_fmadd_ps(ar2,_mm256_loadu_ps(b4+p+i),acc4);
+						  acc5=_mm256_fmadd_ps(ar2,_mm256_loadu_ps(b5+p+i),acc5);
+						  acc6=_mm256_fmadd_ps(ar2,_mm256_loadu_ps(b6+p+i),acc6);
+						  acc7=_mm256_fmadd_ps(ar2,_mm256_loadu_ps(b7+p+i),acc7);
+						}
+						  
 					}
 					float final_c_value0=horizontal_sum(acc0);
 					float final_c_value1=horizontal_sum(acc1);
