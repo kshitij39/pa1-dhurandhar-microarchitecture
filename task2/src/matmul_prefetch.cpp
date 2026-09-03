@@ -17,8 +17,8 @@ int mini(int a,int b)
 {
 	return (a>b)?b:a;
 }
-const int BLOCK_M=64;
-const int BLOCK_N=64;
+const int BLOCK_M=128;
+const int BLOCK_N=128;
 const int PREFETCH_DISTANCE =256;
 const int STRIDE =256;
 void matmul_prefetch(const float* A, const float* B, float* C,
