@@ -46,6 +46,7 @@ void matmul_prefetch(const float* A, const float* B, float* C,
 					__m256 acc7=_mm256_setzero_ps();
 					//initialise to store 8 float values of a
 					__m256 ar=_mm256_setzero_ps();
+					__m256 ar2=_mm256_setzero_ps();
 					//to store 8 float values of b
 					const float *b0=B + static_cast<long>(j+0)*ldb;
 					const float *b1=B + static_cast<long>(j+1)*ldb;
@@ -58,10 +59,12 @@ void matmul_prefetch(const float* A, const float* B, float* C,
 
 
 					int p=0;
-					for(;p<=K-8;p=p+8){
+					for(;p<=K-16;p=p+16){
 
 						//prefetching
-						/*_mm_prefetch((const char*)(a+p+PREFETCH_DISTANCE),_MM_HINT_T0);
+						//only prefetch the 8float of a
+						_mm_prefetch((const char*)(a+p+PREFETCH_DISTANCE),_MM_HINT_T0);
+						/*
 						_mm_prefetch((const char*)(b0+p+PREFETCH_DISTANCE),_MM_HINT_T0);
 						_mm_prefetch((const char*)(b1+p+PREFETCH_DISTANCE),_MM_HINT_T0);
 						_mm_prefetch((const char*)(b2+p+PREFETCH_DISTANCE),_MM_HINT_T0);
@@ -81,6 +84,16 @@ void matmul_prefetch(const float* A, const float* B, float* C,
 						acc5=_mm256_fmadd_ps(ar,_mm256_loadu_ps(b5+p),acc5);
 						acc6=_mm256_fmadd_ps(ar,_mm256_loadu_ps(b6+p),acc6);
 						acc7=_mm256_fmadd_ps(ar,_mm256_loadu_ps(b7+p),acc7);
+						
+						ar2=_mm256_loadu_ps(a+p+8);
+						acc0=_mm256_fmadd_ps(ar2,_mm256_loadu_ps(b0+p+8),acc0);
+						acc1=_mm256_fmadd_ps(ar2,_mm256_loadu_ps(b1+p+8),acc1);
+						acc2=_mm256_fmadd_ps(ar2,_mm256_loadu_ps(b2+p+8),acc2);
+						acc3=_mm256_fmadd_ps(ar2,_mm256_loadu_ps(b3+p+8),acc3);
+						acc4=_mm256_fmadd_ps(ar2,_mm256_loadu_ps(b4+p+8),acc4);
+						acc5=_mm256_fmadd_ps(ar2,_mm256_loadu_ps(b5+p+8),acc5);
+						acc6=_mm256_fmadd_ps(ar2,_mm256_loadu_ps(b6+p+8),acc6);
+						acc7=_mm256_fmadd_ps(ar2,_mm256_loadu_ps(b7+p+8),acc7);
 					}
 					float final_c_value0=horizontal_sum(acc0);
 					float final_c_value1=horizontal_sum(acc1);
