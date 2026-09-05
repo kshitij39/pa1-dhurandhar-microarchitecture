@@ -17,10 +17,10 @@ int mini(int a,int b)
 {
 	return (a>b)?b:a;
 }
-const int BLOCK_M=128;
-const int BLOCK_N=128;
-const int PREFETCH_DISTANCE =256;
-const int STRIDE =256;
+const int BLOCK_M=64;
+const int BLOCK_N=64;
+const int PREFETCH_DISTANCE =32;
+const int STRIDE =16;
 void matmul_prefetch(const float* A, const float* B, float* C,
 		int M, int N, int K, int lda, int ldb, int ldc) {
 	// TODO(student): replace this placeholder with your cache-blocked SIMD + prefetch
