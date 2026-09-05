@@ -19,7 +19,9 @@ void matmul_simd(const float* A, const float* B, float* C,
         
         for(int j=0;j<N;j+=4){
 
-
+            // sum are temps for storing a block * b block and adding them to their previous values
+            // i.e. sum0 = sum0 + one block of row i of a * one block of solumn j of b
+            // sum are 8 values size and summated after k loop completes i.e after one complete column and row ends
             __m256 sum0 = _mm256_setzero_ps();
             __m256 sum1 = _mm256_setzero_ps();
             __m256 sum2 = _mm256_setzero_ps();
