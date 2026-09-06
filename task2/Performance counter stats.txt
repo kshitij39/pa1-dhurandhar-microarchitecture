@@ -54,3 +54,20 @@ L1-dcache-load-misses : 2819506758
 L1 D-cache MPKI       : 8.6840
 
 
+Prefetch distance
+8		18.78x
+16		20.08x
+32		20.38x
+64		20.30x
+128		20.53x
+256		19.81x
+512		19.91x
+1024		19.51x
+
+Prefetch level
+T0		20.51x
+T1		19.76x
+T2		19.76x
+NTA		7.40x
+
+

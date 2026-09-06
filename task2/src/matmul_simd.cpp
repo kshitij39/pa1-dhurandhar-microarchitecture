@@ -21,7 +21,7 @@ void matmul_simd(const float* A, const float* B, float* C,
 
         int j = 0;
         for (; j + 3 < N; j += 4) {
-
+            //initializes 16 avx256 registers with 0
             __m256 sum00 = _mm256_setzero_ps(), sum01 = _mm256_setzero_ps();
             __m256 sum02 = _mm256_setzero_ps(), sum03 = _mm256_setzero_ps();
             __m256 sum10 = _mm256_setzero_ps(), sum11 = _mm256_setzero_ps();
@@ -34,17 +34,18 @@ void matmul_simd(const float* A, const float* B, float* C,
             int k = 0;
             // vectorized part: only while a full 8-wide chunk of k remains
             for (; k + 7 < K; k += 8) {
-
+                //loaded 8 floats from first four rows of A
                 __m256 a0 = _mm256_loadu_ps(&A[i*lda + k]);
                 __m256 a1 = _mm256_loadu_ps(&A[(i+1)*lda + k]);
                 __m256 a2 = _mm256_loadu_ps(&A[(i+2)*lda + k]);
                 __m256 a3 = _mm256_loadu_ps(&A[(i+3)*lda + k]);
-
+                //loaded 8 floats from  first four columns of B,here B is stored column major so this works
                 __m256 b0 = _mm256_loadu_ps(&B[j*ldb + k]);
                 __m256 b1 = _mm256_loadu_ps(&B[(j+1)*ldb + k]);
                 __m256 b2 = _mm256_loadu_ps(&B[(j+2)*ldb + k]);
                 __m256 b3 = _mm256_loadu_ps(&B[(j+3)*ldb + k]);
-
+                
+                //added the first 8 floats of first row of A dot product with first 8 floats of first column of B and added with sum
                 sum00 = _mm256_fmadd_ps(a0,b0,sum00); sum01 = _mm256_fmadd_ps(a0,b1,sum01);
                 sum02 = _mm256_fmadd_ps(a0,b2,sum02); sum03 = _mm256_fmadd_ps(a0,b3,sum03);
 
@@ -59,6 +60,7 @@ void matmul_simd(const float* A, const float* B, float* C,
             }
 
             // reduce the 8-wide accumulators to scalars
+            //the 16 sum have 8 floats each which are needed to be added
             float c00=reduce_sum(sum00), c01=reduce_sum(sum01), c02=reduce_sum(sum02), c03=reduce_sum(sum03);
             float c10=reduce_sum(sum10), c11=reduce_sum(sum11), c12=reduce_sum(sum12), c13=reduce_sum(sum13);
             float c20=reduce_sum(sum20), c21=reduce_sum(sum21), c22=reduce_sum(sum22), c23=reduce_sum(sum23);

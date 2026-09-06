@@ -27,7 +27,7 @@ static float reduce_sum(__m256 sum){
 const int BLOCK_M = 64;
 const int BLOCK_N = 64;
 const int BLOCK_K = 64;
-const int PREFETCH_DISTANCE = 64; // increased since we now prefetch less often — see below
+const int PREFETCH_DISTANCE = 32; // increased since we now prefetch less often — see below
 
 // B is K x N, stored column-major with leading dimension ldb:
 // element (k, j) lives at B[j*ldb + k] (each column j is contiguous in k)
