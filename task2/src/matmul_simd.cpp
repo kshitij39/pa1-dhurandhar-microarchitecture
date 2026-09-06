@@ -22,7 +22,7 @@ float reduce_sum(__m256 sum){
     // vertical sum
     low = _mm_add_ps(low,high);
     // horizontal sum
-    low = _mm_add_ps(low,low);
+    low = _mm_hadd_ps(low,low);
     // again horizontal sum
     low = _mm_hadd_ps(low,low);
     
