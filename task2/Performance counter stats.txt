@@ -1,0 +1,56 @@
+Performance counter stats for './bin/matmul simd 512 512 512
+--- MPKI ---
+instructions          : 5122986542
+L1-dcache-load-misses : 59148156
+L1 D-cache MPKI       : 11.5456
+
+ Performance counter stats for './bin/matmul simd 1024 1024 1024':
+--- MPKI ---
+instructions          : 40127161034
+L1-dcache-load-misses : 481472938
+L1 D-cache MPKI       : 11.9987
+
+ Performance counter stats for './bin/matmul simd 2048 2048 2048':
+-- MPKI ---
+instructions          : 319706795705
+L1-dcache-load-misses : 3216559900
+L1 D-cache MPKI       : 10.0610
+
+
+ Performance counter stats for './bin/matmul prefetch 512 512 512':
+-- MPKI ---
+instructions          : 5187842695
+L1-dcache-load-misses : 56135018
+L1 D-cache MPKI       : 10.8205
+
+ Performance counter stats for './bin/matmul prefetch 1024 1024 1024':
+--- MPKI ---
+instructions          : 40839101096
+L1-dcache-load-misses : 438624455
+L1 D-cache MPKI       : 10.7403
+
+ Performance counter stats for './bin/matmul prefetch 2048 2048 2048':
+--- MPKI ---
+instructions          : 325198716195
+L1-dcache-load-misses : 2831507226
+L1 D-cache MPKI       : 8.7070
+
+ Performance counter stats for './bin/matmul optimized 512 512 512':
+--- MPKI ---
+instructions          : 5207241295
+L1-dcache-load-misses : 56044768
+L1 D-cache MPKI       : 10.7629
+
+ Performance counter stats for './bin/matmul optimized 1024 1024 1024':
+-- MPKI ---
+instructions          : 40776731573
+L1-dcache-load-misses : 437846530
+L1 D-cache MPKI       : 10.7377
+
+ Performance counter stats for './bin/matmul optimized 2048 2048 2048':
+-- MPKI ---
+instructions          : 324678487751
+L1-dcache-load-misses : 2819506758
+L1 D-cache MPKI       : 8.6840
+
+
