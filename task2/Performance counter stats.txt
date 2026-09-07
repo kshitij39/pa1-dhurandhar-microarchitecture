@@ -70,4 +70,60 @@ T1		19.76x
 T2		19.76x
 NTA		7.40x
 
+BLOCK size
+64	
+stage           correct    time(ms)     GFLOP/s    speedup
+--------------------------------------------------------------
+naive (ref)     yes         475.918        4.51      1.00x
+simd            yes          28.102       76.42     16.94x
+prefetch        yes          22.852       93.98     20.83x
+optimized       yes          22.785       94.25     20.89x
+
+128
+stage           correct    time(ms)     GFLOP/s    speedup
+--------------------------------------------------------------
+naive (ref)     yes         475.219        4.52      1.00x
+simd            yes          28.300       75.88     16.79x
+prefetch        yes          22.739       94.44     20.90x
+optimized       yes          22.374       95.98     21.24x
+
+256
+stage           correct    time(ms)     GFLOP/s    speedup
+--------------------------------------------------------------
+naive (ref)     yes         475.659        4.51      1.00x
+simd            yes          28.148       76.29     16.90x
+prefetch        yes          23.481       91.46     20.26x
+optimized       yes          23.162       92.71     20.54x
+
+512
+stage           correct    time(ms)     GFLOP/s    speedup
+--------------------------------------------------------------
+naive (ref)     yes         475.106        4.52      1.00x
+simd            yes          28.222       76.09     16.83x
+prefetch        yes          25.349       84.72     18.74x
+optimized       yes          23.082       93.04     20.58x
+
+1024
+stage           correct    time(ms)     GFLOP/s    speedup
+--------------------------------------------------------------
+naive (ref)     yes         476.310        4.51      1.00x
+simd            yes          28.241       76.04     16.87x
+prefetch        yes          25.609       83.86     18.60x
+optimized       yes          22.928       93.66     20.77x
+
+2048
+stage           correct    time(ms)     GFLOP/s    speedup
+--------------------------------------------------------------
+naive (ref)     yes         477.502        4.50      1.00x
+simd            yes          28.822       74.51     16.57x
+prefetch        yes          26.206       81.95     18.22x
+optimized       yes          22.875       93.88     20.87x
+
+4096
+stage           correct    time(ms)     GFLOP/s    speedup
+--------------------------------------------------------------
+naive (ref)     yes         475.085        4.52      1.00x
+simd            yes          28.064       76.52     16.93x
+prefetch        yes          25.530       84.12     18.61x
+optimized       yes          22.900       93.77     20.75x
 
