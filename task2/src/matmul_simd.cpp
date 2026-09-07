@@ -182,9 +182,9 @@ void matmul_simd(const float* A, const float* B, float* C,
 
             //storing in C
             C[i*ldc+j] = c00;
-            C[i+ldc+j+1] = c01;
-            C[i+ldc+j+2] = c02;
-            C[i+ldc+j+3] = c03;
+            C[i*ldc+j+1] = c01;
+            C[i*ldc+j+2] = c02;
+            C[i*ldc+j+3] = c03;
 
             C[(i+1)*ldc+j] = c10;
             C[(i+1)*ldc+j+1] = c11;
