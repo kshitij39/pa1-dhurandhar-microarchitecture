@@ -6,6 +6,44 @@ inline int mini(int a, int b) {
     return (a > b) ? b : a;
 }
 
+const int BLOCK_M = 128;
+const int BLOCK_N = 128;
+const int BLOCK_K = 128;
+const int PREFETCH_DISTANCE = 64; 
+const int PREFETCH_DEGREE = 2;
+
+void matmul_prefetch(const float* A, const float* B, float* C,
+                     int M, int N, int K, int lda, int ldb, int ldc) {
+    for(int i_blk = 0; i_blk < M; i_blk += BLOCK_M) {
+        int i_end = mini(i_blk + BLOCK_M, M);
+
+        for(int j_blk = 0; j_blk < N; j_blk += BLOCK_N) {
+            int j_end = mini(j_blk + BLOCK_N, N);
+
+            for(int i = i_blk; i < i_end; i++) {
+                for(int j = j_blk; j < j_end; j++) {
+                    
+                    float sum = 0.0f;
+
+                    for(int k_blk = 0; k_blk < K; k_blk += BLOCK_K) {
+                        int k_end = mini(k_blk + BLOCK_K, K);
+
+                        for(int k = k_blk; k < k_end; k++) {
+                            for(int d = 0; d < PREFETCH_DEGREE; d++) {
+                                _mm_prefetch((const char*)&A[i*lda + k + PREFETCH_DISTANCE + (d * 16)], _MM_HINT_T0);
+                                _mm_prefetch((const char*)&B[j*ldb + k + PREFETCH_DISTANCE + (d * 16)], _MM_HINT_T0);
+                            }
+
+                            sum += A[i*lda + k] * B[j*ldb + k];
+                        }
+                    }
+                    C[i*ldc + j] = sum;
+                }
+            }
+        }
+    }
+}
+/*
 static float reduce_sum(__m256 sum){
     
     __m128 low = _mm256_castps256_ps128(sum);
@@ -139,3 +177,4 @@ void matmul_prefetch(const float* A, const float* B, float* C,
         }
     }
 }
+*/
