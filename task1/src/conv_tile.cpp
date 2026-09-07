@@ -1,8 +1,8 @@
 // conv_tile.cpp  STAGE 3: CACHE TILING
 
 #include "convolution.h"
-#define TILEH 96
-#define TILEW 96
+#define TILEH 32
+#define TILEW 32
 
 
 void conv_tile(const float* in, float* out, const float* ker,
