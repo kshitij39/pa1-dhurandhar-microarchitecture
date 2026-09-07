@@ -48,7 +48,7 @@ void matmul_simd(const float* A, const float* B, float* C,
         // c[i][j]   = row i of a * column j of b
         
         
-        for(int j=0;j<N;j+=4){
+        for(int j=0;j+3<N;j+=4){
 
             // sum are temps for storing a block * b block and adding them to their previous values
             // i.e. sum0 = sum0 + one block of row i of a * one block of solumn j of b
@@ -74,8 +74,8 @@ void matmul_simd(const float* A, const float* B, float* C,
             __m256 sum32 = _mm256_setzero_ps();
             __m256 sum33 = _mm256_setzero_ps();
 
-        
-            for(int k=0;k<K;k+=8){
+            int k=0;
+            for(;k+7<K;k+=8){
 
                 // loading 8 elements from row i of a
                 __m256 a0 = _mm256_loadu_ps(&A[i*lda + k]);
@@ -138,29 +138,90 @@ void matmul_simd(const float* A, const float* B, float* C,
             // for this using function reduce sum
             
 
-            C[i*ldc + j]   = reduce_sum(sum00);
-            C[i*ldc + j+1] = reduce_sum(sum01);
-            C[i*ldc + j+2] = reduce_sum(sum02);
-            C[i*ldc + j+3] = reduce_sum(sum03);
+            float c00 = reduce_sum(sum00);
+            float c01 = reduce_sum(sum01);
+            float c02 = reduce_sum(sum02);
+            float c03 = reduce_sum(sum03);
 
-            C[(i+1)*ldc + j]   = reduce_sum(sum10);
-            C[(i+1)*ldc + j+1] = reduce_sum(sum11);
-            C[(i+1)*ldc + j+2] = reduce_sum(sum12);
-            C[(i+1)*ldc + j+3] = reduce_sum(sum13);
+            float c10 = reduce_sum(sum10);
+            float c11 = reduce_sum(sum11);
+            float c12 = reduce_sum(sum12);
+            float c13 = reduce_sum(sum13);
 
-            C[(i+2)*ldc + j]   = reduce_sum(sum20);
-            C[(i+2)*ldc + j+1] = reduce_sum(sum21);
-            C[(i+2)*ldc + j+2] = reduce_sum(sum22);
-            C[(i+2)*ldc + j+3] = reduce_sum(sum23);
+            float c20 = reduce_sum(sum20);
+            float c21 = reduce_sum(sum21);
+            float c22 = reduce_sum(sum22);
+            float c23 = reduce_sum(sum23);
 
-            C[(i+3)*ldc + j]   = reduce_sum(sum30);
-            C[(i+3)*ldc + j+1] = reduce_sum(sum31);
-            C[(i+3)*ldc + j+2] = reduce_sum(sum32);
-            C[(i+3)*ldc + j+3] = reduce_sum(sum33);
+            float c30 = reduce_sum(sum30);
+            float c31 = reduce_sum(sum31);
+            float c32 = reduce_sum(sum32);
+            float c33 = reduce_sum(sum33);
+            // handling remaining elements in case when K not divisible by 8
+            for(;k<K;k++){
+                c00 += A[i*lda+k]*B[j*ldb+k];
+                c01 += A[i*lda+k]*B[(j+1)*ldb+k];
+                c02 += A[i*lda+k]*B[(j+2)*ldb+k];
+                c03 += A[i*lda+k]*B[(j+3)*ldb+k];
 
+                c10 += A[(i+1)*lda+k]*B[j*ldb+k];
+                c11 += A[(i+1)*lda+k]*B[(j+1)*ldb+k];
+                c12 += A[(i+1)*lda+k]*B[(j+2)*ldb+k];
+                c13 += A[(i+1)*lda+k]*B[(j+3)*ldb+k];
 
+                c20 += A[(i+2)*lda+k]*B[j*ldb+k];
+                c21 += A[(i+2)*lda+k]*B[(j+1)*ldb+k];
+                c22 += A[(i+2)*lda+k]*B[(j+2)*ldb+k];
+                c23 += A[(i+2)*lda+k]*B[(j+3)*ldb+k];
+
+                c30 += A[(i+3)*lda+k]*B[j*ldb+k];
+                c31 += A[(i+3)*lda+k]*B[(j+1)*ldb+k];
+                c32 += A[(i+3)*lda+k]*B[(j+2)*ldb+k];
+                c33 += A[(i+3)*lda+k]*B[(j+3)*ldb+k];
+            }
+
+            //storing in C
+            C[i*ldc+j] = c00;
+            C[i+ldc+j+1] = c01;
+            C[i+ldc+j+2] = c02;
+            C[i+ldc+j+3] = c03;
+
+            C[(i+1)*ldc+j] = c10;
+            C[(i+1)*ldc+j+1] = c11;
+            C[(i+1)*ldc+j+2] = c12;
+            C[(i+1)*ldc+j+3] = c13;
+
+            C[(i+2)*ldc+j] = c20;
+            C[(i+2)*ldc+j+1] = c21;
+            C[(i+2)*ldc+j+2] = c22;
+            C[(i+2)*ldc+j+3] = c23;
+
+            C[(i+3)*ldc+j] = c30;
+            C[(i+3)*ldc+j+1] = c31;
+            C[(i+3)*ldc+j+2] = c32;
+            C[(i+3)*ldc+j+3] = c33;
+        }
+
+        //remaining columns
+        for(int j= (N/4)*4;j<N;j++){
+            for(int row =i;row<i+4;row++){
+                float sum = 0.0f;
+                for(int k=0;k<K;k++){
+                    sum += A[row*lda+k]*B[j*ldb+k];
+                }
+                C[row*ldc+j] = sum;
+            }
         }
     }
-
+    //reamining rows
+    for(int i=(M/4)*4;i<M;i++){
+        for(int j=0;j<N;j++){
+            float sum=0.0f;
+            for(int k=0;k<K;k++){
+                sum += A[i*lda+k]*B[j*ldb+k];
+            }
+            C[i*ldc+j] = sum;
+        }
+    }
     //matmul_naive(A, B, C, M, N, K, lda, ldb, ldc);
 }
